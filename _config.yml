@@ -32,49 +32,42 @@
 #
 # Compute responsibly.
 
-snippets: "/snippets_library/HPCC_MagicCastle_slurm"
+snippets: "/snippets_library/Unicamp_Cenapad_PBS"
 
 local:
-  prompt: "[you@laptop:~]$"
-  bash_shebang: "#!/usr/bin/env bash"
+  prompt: "[user@laptop ~]$"
 
 remote:
-  name: "HPC Carpentry's Cloud Cluster"
-  login: "cluster.hpc-carpentry.org"
-  portal: "https://mokey.cluster.hpc-carpentry.org"
-  host: "login1"
-  node: "node1"
-  location: "cluster.hpc-carpentry.org"
+  name: "CENAPAD"
+  login: "myriad.rc.ucl.ac.uk"
+  node: node-d00a-001
+  location: "UNICAMP"
   homedir: "/home"
   user: "yourUsername"
-  module_python3: "Python"
-  prompt: "[yourUsername@login1 ~]$"
-  bash_shebang: "#!/bin/bash"
+  prompt: "[yourUsername@login12 ~]$ "
+  bash_shebang: "#!/bin/bash -l"
 
 sched:
-  name: "Slurm"
+  name: "SGE"
   submit:
-    name: "sbatch"
+    name: "qsub"
     options: ""
-  queue:
-    debug: "smnode"
-    testing: "cpubase_bycore_b1"
-  status: "squeue"
+    iopt: ""
+  status: "qstat"
   flag:
     user: "-u yourUsername"
-    interactive: ""
-    histdetail: "-l -j"
-    name: "-J"
-    time: "-t"
-    queue: "-p"
-    nodes: "-N"
-    tasks: "-n"
-  del: "scancel"
-  interactive: "srun"
-  info: "sinfo"
-  comment: "#SBATCH"
-  hist: "sacct -u yourUsername"
+    interactive: "-l mem=512M,h_rt=2:00:00"
+    name: "-N"
+    histdetail: "-j"
+    time: "-l h_rt="
+    queue: "-q"
+  del: "qdel"
+  interactive: "qrsh"
+  info: "qhost"
+  comment: "#$ "
+  hist: "jobhist"
   hist_filter: ""
+  bash_shebang: "#!/bin/bash -l"
 
 episode_order:
   - 10-hpc-intro
