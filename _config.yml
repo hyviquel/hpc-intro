@@ -39,19 +39,19 @@ local:
 
 remote:
   name: "CENAPAD"
-  login: "myriad.rc.ucl.ac.uk"
-  node: node-d00a-001
+  login: "cenapad.unicamp.br"
+  node: lovelace
   location: "UNICAMP"
-  homedir: "/home"
+  homedir: "/home/lovelace/proj/projeto"
   user: "yourUsername"
-  prompt: "[yourUsername@login12 ~]$ "
+  prompt: "[yourUsername@lovelace ~]$ "
   bash_shebang: "#!/bin/bash -l"
 
 sched:
-  name: "SGE"
+  name: "PBS"
   submit:
     name: "qsub"
-    options: ""
+    options: "-q testes"
     iopt: ""
   status: "qstat"
   flag:
@@ -62,10 +62,12 @@ sched:
     time: "-l h_rt="
     queue: "-q"
   del: "qdel"
-  interactive: "qrsh"
-  info: "qhost"
-  comment: "#$ "
-  hist: "jobhist"
+  interactive: "qsub -I"
+  info: "pbsnodes -aSj"
+  jobs: "qstat -a"
+  queue: "qstat -Q"
+  comment: "#PBS "
+  hist: ""
   hist_filter: ""
   bash_shebang: "#!/bin/bash -l"
 
