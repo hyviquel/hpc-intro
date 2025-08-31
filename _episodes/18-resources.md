@@ -52,7 +52,7 @@ scheduler to see how long our job took and what resources were used. We will
 use `{{ site.sched.hist }}` to get statistics about `parallel-job.sh`.
 
 ```
-{{ site.remote.prompt }} {{ site.sched.hist }}
+{{ site.remote.prompt }} {{ site.sched.hist }} -u $USER
 ```
 {: .language-bash}
 
@@ -60,11 +60,11 @@ use `{{ site.sched.hist }}` to get statistics about `parallel-job.sh`.
 
 This shows all the jobs we ran today (note that there are multiple entries per
 job).
-To get info about a specific job (for example, 347087), we change command
+To get info about a specific job (for example, 299542), we change command
 slightly.
 
 ```
-{{ site.remote.prompt }} {{ site.sched.hist }} {{ site.sched.flag.histdetail }} 347087
+{{ site.remote.prompt }} {{ site.sched.hist }} {{ site.sched.flag.histdetail }} 299542
 ```
 {: .language-bash}
 
@@ -74,7 +74,7 @@ information to `less` to make it easier to view (use the left and right arrow
 keys to scroll through fields).
 
 ```
-{{ site.remote.prompt }} {{ site.sched.hist }} {{ site.sched.flag.histdetail }} 347087 | less -S
+{{ site.remote.prompt }} {{ site.sched.hist }} {{ site.sched.flag.histdetail }} 299542 | less -S
 ```
 {: .language-bash}
 

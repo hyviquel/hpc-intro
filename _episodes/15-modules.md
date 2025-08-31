@@ -69,7 +69,7 @@ you are using.
 
 ### Listing Available Modules
 
-To see available software modules, use `module avail`:
+To see available software modules, use `module avail` or `ml av`:
 
 ```
 {{ site.remote.prompt }} module avail
@@ -80,7 +80,7 @@ To see available software modules, use `module avail`:
 
 ### Listing Currently Loaded Modules
 
-You can use the `module list` command to see which modules you currently have
+You can use the `module list` or `ml` command to see which modules you currently have
 loaded in your environment. If you have no modules loaded, you will see a
 message telling you so
 
@@ -93,7 +93,7 @@ message telling you so
 
 ## Loading and Unloading Software
 
-To load a software module, use `module load`. In this example we will use
+To load a software module, use `module load` or `ml`. In this example we will use
 Python 3.
 
 Initially, Python 3 is not loaded. We can test this by using the `which`
@@ -123,7 +123,7 @@ before giving up and telling us it can't find it. As with all environment
 variables we can print it out using `echo`.
 
 ```
-{{ site.remote.prompt }} echo $PATH
+{{ site.remote.prompt }} echo $PATH | tr ':' '\n'
 ```
 {: .language-bash}
 
@@ -195,9 +195,9 @@ Let's examine the output of `module avail` more closely.
 > >
 > > ```
 > > {{ site.remote.bash_shebang }}
-> > {{ site.sched.comment }} {{ site.sched.flag.partition }}{% if site.sched.flag.qos %}
+> > {% if site.sched.flag.qos %}
 > > {{ site.sched.comment }} {{ site.sched.flag.qos }}
-> > {% endif %}{{ site.sched.comment }} {{ site.sched.flag.time }} 00:00:30
+> > {% endif %}{{ site.sched.comment }} {{ site.sched.flag.time }}  00:00:30
 > > 
 > > module load {{ site.remote.module_python3 }}
 > >

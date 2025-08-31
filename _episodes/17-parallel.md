@@ -26,7 +26,7 @@ we have to improve the performance of computational tasks.
 If you disconnected, log back in to the cluster.
 
 ```
-{{ site.local.prompt }} ssh {{ site.remote.user }}@{{ site.remote.login }}
+{{ site.local.prompt }} ssh -p {{ site.remote.port }} {{ site.remote.user }}@{{ site.remote.login }}
 ```
 {: .language-bash}
 
@@ -39,6 +39,7 @@ or `pip`, to install it in your ("user") home directory:
 
 ```
 {{ site.remote.prompt }} cd amdahl
+{{ site.remote.prompt }} module load python/3.8.12-gcc-9.4.0
 {{ site.remote.prompt }} python3 -m pip install --user .
 ```
 {: .language-bash}
@@ -46,44 +47,18 @@ or `pip`, to install it in your ("user") home directory:
 > ## Amdahl is Python Code
 >
 > The Amdahl program is written in Python, and installing or using it requires
-> locating the `python3` executable on the login node.
-> If it can't be found, try listing available modules using `module avail`,
-> load the appropriate one, and try the command again.
+> locating the `python3` executable on the head node. For this reason, do not forget loading
+> the python module.
 {: .callout}
 
 ### MPI for Python
 
-The Amdahl code has one dependency: __mpi4py__.
-If it hasn't already been installed on the cluster, `pip` will attempt to
-collect mpi4py from the Internet and install it for you.
-If this fails due to a one-way firewall, you must retrieve mpi4py on your
-local machine and upload it, just as we did for Amdahl.
+The Amdahl code has one dependency: __mpi4py__. In {{site.remote.name }}, you can load it executing:
 
-> ## Retrieve and Upload `mpi4py`
->
-> If installing Amdahl failed because mpi4py could not be installed,
-> retrieve the tarball from <https://github.com/mpi4py/mpi4py/tarball/master>
-> then `rsync` it to the cluster, extract, and install:
->
-> ```
-> {{ site.local.prompt }} wget -O mpi4py.tar.gz https://github.com/mpi4py/mpi4py/releases/download/3.1.4/mpi4py-3.1.4.tar.gz
-> {{ site.local.prompt }} scp mpi4py.tar.gz {{ site.remote.user }}@{{ site.remote.login }}:
-> # or
-> {{ site.local.prompt }} rsync -avP mpi4py.tar.gz {{ site.remote.user }}@{{ site.remote.login }}:
-> ```
-> {: .language-bash}
->
-> ```
-> {{ site.local.prompt }} ssh {{ site.remote.user }}@{{ site.remote.login }}
-> {{ site.remote.prompt }} tar -xvzf mpi4py.tar.gz  # extract the archive
-> {{ site.remote.prompt }} mv mpi4py* mpi4py        # rename the directory
-> {{ site.remote.prompt }} cd mpi4py
-> {{ site.remote.prompt }} python3 -m pip install --user .
-> {{ site.remote.prompt }} cd ../amdahl
-> {{ site.remote.prompt }} python3 -m pip install --user .
-> ```
-> {: .language-bash}
-{: .discussion}
+```
+{{ site.remote.prompt }} module load py-mpi4py/3.1.4-gcc-9.4.0
+```
+{: .language-bash}
 
 > ## If `pip` Raises a Warning...
 >
@@ -191,11 +166,12 @@ reverse-chronological order: newest first. What was the output?
 > ```
 > {: .language-bash}
 > ```
-> slurm-347087.out  serial-job.sh  amdahl  README.md  LICENSE.txt
+> amdahl           build    README.md         serial-job.sh  solo-job.e299528  venv
+> amdahl.egg-info  LICENSE  requirements.txt  setup.py       solo-job.o299528
 > ```
 > {: .output}
 > ```
-> {{ site.remote.prompt }} cat slurm-347087.out
+> {{ site.remote.prompt }} cat solo-job.o299528
 > ```
 > {: .language-bash}
 > ```
@@ -284,11 +260,14 @@ As before, use the status commands to check when your job runs.
 ```
 {: .language-bash}
 ```
-slurm-347178.out  parallel-job.sh  slurm-347087.out  serial-job.sh  amdahl  README.md  LICENSE.txt
+parallel-job.o299531  solo-job.o299528  amdahl.egg-info  amdahl     requirements.txt
+parallel-job.e299531  solo-job.e299528  build            LICENSE    setup.py
+parallel-job.sh       serial-job.sh     venv             README.md
+
 ```
 {: .output}
 ```
-{{ site.remote.prompt }} cat slurm-347178.out
+{{ site.remote.prompt }} cat parallel-job.o299531 
 ```
 {: .language-bash}
 ```
@@ -382,11 +361,14 @@ As before, use the status commands to check when your job runs.
 ```
 {: .language-bash}
 ```
-slurm-347271.out  parallel-job.sh  slurm-347178.out  slurm-347087.out  serial-job.sh  amdahl  README.md  LICENSE.txt
+parallel-job.o299542  parallel-job.o299532  solo-job.e299528  build   LICENSE           setup.py
+parallel-job.e299542  parallel-job.e299532  serial-job.sh     venv    README.md
+parallel-job.sh       solo-job.o299528      amdahl.egg-info   amdahl  requirements.txt
+
 ```
 {: .output}
 ```
-{{ site.remote.prompt }} cat slurm-347178.out
+{{ site.remote.prompt }} cat parallel-job.o299542
 ```
 {: .language-bash}
 ```

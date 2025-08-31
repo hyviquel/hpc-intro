@@ -71,14 +71,14 @@ manner. Our shell script will have three parts:
 ```
 {{ site.remote.bash_shebang }}
 
-echo -n "This script is running on "
+echo -n "This script is running on: "
 hostname
 ```
 {: .output}
 
 > ## Creating Our Test Job
 >
-> Run the script. Does it execute on the cluster or just our login node?
+> Run the script. Does it execute on the cluster or just our head node?
 >
 > > ## Solution
 > >
@@ -87,13 +87,13 @@ hostname
 > > ```
 > > {: .language-bash}
 > > ```
-> > This script is running on {{ site.remote.host }}
+> > This script is running on: {{ site.remote.node_host }}
 > > ```
 > > {: .output}
 > {: .solution}
 {: .challenge}
 
-This script ran on the login node, but we want to take advantage of
+This script ran on the head node, but we want to take advantage of
 the compute nodes: we need the scheduler to queue up `example-job.sh`
 to run on a compute node.
 
@@ -125,8 +125,8 @@ status, we check the queue using the command
 
 > ## Where's the Output?
 >
-> On the login node, this script printed output to the terminal -- but
-> now, when `{{ site.sched.status }}` shows the job has finished,
+> On the head node, this script printed output to the terminal -- but
+> now, when `{{ site.sched.status }} {{ site.sched.flag.user }}` shows the job has finished,
 > nothing was printed to the terminal.
 >
 > Cluster job output is typically redirected to a file in the directory you
@@ -144,7 +144,7 @@ resources we must customize our job script.
 Comments in UNIX shell scripts (denoted by `#`) are typically ignored, but
 there are exceptions. For instance the special `#!` comment at the beginning of
 scripts specifies what program should be used to run it (you'll typically see
-`{{ site.local.bash_shebang }}`). Schedulers like {{ site.sched.name }} also
+`{{ site.remote.bash_shebang }}`). Schedulers like {{ site.sched.name }} also
 have a special comment used to denote special scheduler-specific options.
 Though these comments differ from scheduler to scheduler,
 {{ site.sched.name }}'s special comment is `{{ site.sched.comment }}`. Anything
@@ -164,7 +164,7 @@ name of a job. Add an option to the script:
 {{ site.remote.bash_shebang }}
 {{ site.sched.comment }} {{ site.sched.flag.name }} hello-world
 
-echo -n "This script is running on "
+echo -n "This script is running on: "
 hostname
 ```
 {: .output}
@@ -207,7 +207,8 @@ later episode of this lesson.
 > ## Submitting Resource Requests
 >
 > Modify our `hostname` script so that it runs for a minute, then submit a job
-> for it on the cluster.
+> for it on the cluster. Remember the time
+> format is `HH:MM:SS`, `MM:SS`, or `SS`.
 >
 > > ## Solution
 > >
@@ -218,9 +219,9 @@ later episode of this lesson.
 > >
 > > ```
 > > {{ site.remote.bash_shebang }}
-> > {{ site.sched.comment }} {{ site.sched.flag.time }}00:01
+> > {{ site.sched.comment }} {{ site.sched.flag.time }}01:00
 > >
-> > echo -n "This script is running on "
+> > echo -n "This script is running on: "
 > > sleep 20 # time in seconds
 > > hostname
 > > ```
@@ -247,7 +248,7 @@ wall time, and attempt to run a job for two minutes.
 ```
 {{ site.remote.bash_shebang }}
 {{ site.sched.comment }} {{ site.sched.flag.name }} long_job
-{{ site.sched.comment }} {{ site.sched.flag.time }}00:01
+{{ site.sched.comment }} {{ site.sched.flag.time }}01:00
 
 echo "This script is running on ... "
 sleep 240 # time in seconds
@@ -267,6 +268,10 @@ log file.
 {% include {{ site.snippets }}/scheduler/runtime-exceeded-job.snip %}
 
 {% include {{ site.snippets }}/scheduler/runtime-exceeded-output.snip %}
+
+{% include {{ site.snippets }}/scheduler/runtime-exceeded-job-error.snip %}
+
+{% include {{ site.snippets }}/scheduler/runtime-exceeded-error.snip %}
 
 Our job was killed for exceeding the amount of resources it requested. Although
 this appears harsh, this is actually a feature. Strict adherence to resource
@@ -299,7 +304,7 @@ return of your command prompt indicates that the request to cancel the job was
 successful.
 
 ```
-{{ site.remote.prompt }} {{site.sched.del }} 38759
+{{ site.remote.prompt }} {{site.sched.del }} 299472
 # It might take a minute for the job to disappear from the queue...
 {{ site.remote.prompt }} {{ site.sched.status }} {{ site.sched.flag.user }}
 ```
@@ -316,7 +321,7 @@ Up to this point, we've focused on running jobs in batch mode.
 
 There are very frequently tasks that need to be done interactively. Creating an
 entire job script might be overkill, but the amount of resources required is
-too much for a login node to handle. A good example of this might be building a
+too much for a head node to handle. A good example of this might be building a
 genome index for alignment with a tool like [HISAT2][hisat]. Fortunately, we
 can run these types of tasks as a one-off with `{{ site.sched.interactive }}`.
 
