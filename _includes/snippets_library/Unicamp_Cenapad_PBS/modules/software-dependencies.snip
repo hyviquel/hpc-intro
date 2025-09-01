@@ -1,75 +1,105 @@
-To demonstrate, let's load the `ansys` module and then use the `module list`
-command to show which modules we currently have loaded in our environment.
-([ANSYS](https://www.ansys.com/en-gb) is an engineering simulation product.)
+To demonstrate, let's execute again `module list` to show which modules we 
+currently have loaded in our environment among Python3.
 
 ```
-{{ site.remote.prompt }} module load ansys
+{{ site.remote.prompt }} module list
 ```
 {: .language-bash}
 
 ```
-ansys/2019.r3(73):ERROR:151: Module 'ansys/2019.r3' depends on one of the
-module(s) 'giflib/5.1.1'
-ansys/2019.r3(73):ERROR:102: Tcl command execution failed:
-prereq   giflib/5.1.1
+Currently Loaded Modules:
+  1) zlib/1.2.11-gcc-9.4.0              8) ncurses/6.2-gcc-9.4.0       15) gettext/0.21-gcc-9.4.0
+  2) xz/5.2.5-gcc-9.4.0                 9) libxml2/2.9.12-gcc-9.4.0    16) gdbm/1.21-gcc-9.4.0
+  3) util-linux-uuid/2.36.2-gcc-9.4.0  10) libxcrypt/4.4.33-gcc-9.4.0  17) expat/2.4.1-gcc-9.4.0
+  4) tar/1.34-gcc-9.4.0                11) libmd/1.0.3-gcc-9.4.0       18) bzip2/1.0.8-gcc-9.4.0
+  5) sqlite/3.36.0-gcc-9.4.0           12) libiconv/1.16-gcc-9.4.0     19) python/3.10.10-gcc-9.4.0
+  6) readline/8.1-gcc-9.4.0            13) libffi/3.3-gcc-9.4.0
+  7) openssl/1.1.1l-gcc-9.4.0          14) libbsd/0.11.3-gcc-9.4.0
+
 ```
 {: .output}
 
-This shows that the default `ansys` module will not run because it first needs
-`giflib/5.1.1` to be loaded. Some HPC systems will automatically load
-dependencies like this, but at the time of writing (June 2020) UCL's Myriad
-does not.
-
-Let's load the `giflib` module:
+This shows that by loading the `python` module multiple modules where loaded too.
+They are dependencies required by the `python` module. We can check the dependencies 
+without loading a module by executing `module show`.
 
 ```
-{{ site.remote.prompt }} module load giflib
+{{ site.remote.prompt }} module show python
 ```
 {: .language-bash}
 
 ```
-giflib/5.1.1(18):ERROR:151: Module 'giflib/5.1.1' depends on one of the
-module(s) 'gcc-libs/4.9.2'
-giflib/5.1.1(18):ERROR:102: Tcl command execution failed: prereq gcc-libs
+-----------------------------------------------------------------------------------------------------
+   /opt/pub/spack/modulefiles/python/3.10.10-gcc-9.4.0:
+-----------------------------------------------------------------------------------------------------
+whatis("The Python programming language.")
+load("zlib/1.2.11-gcc-9.4.0")
+load("xz/5.2.5-gcc-9.4.0")
+load("util-linux-uuid/2.36.2-gcc-9.4.0")
+load("tar/1.34-gcc-9.4.0")
+load("sqlite/3.36.0-gcc-9.4.0")
+load("readline/8.1-gcc-9.4.0")
+load("openssl/1.1.1l-gcc-9.4.0")
+load("ncurses/6.2-gcc-9.4.0")
+load("libxml2/2.9.12-gcc-9.4.0")
+load("libxcrypt/4.4.33-gcc-9.4.0")
+load("libmd/1.0.3-gcc-9.4.0")
+load("libiconv/1.16-gcc-9.4.0")
+load("libffi/3.3-gcc-9.4.0")
+load("libbsd/0.11.3-gcc-9.4.0")
+load("gettext/0.21-gcc-9.4.0")
+load("gdbm/1.21-gcc-9.4.0")
+load("expat/2.4.1-gcc-9.4.0")
+load("bzip2/1.0.8-gcc-9.4.0")
+prepend_path("PATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/bin")
+prepend_path("MANPATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/share/man")
+prepend_path("LIBRARY_PATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/lib")
+prepend_path("LD_LIBRARY_PATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/lib")
+prepend_path("CPATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/include")
+prepend_path("PKG_CONFIG_PATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/lib/pkgconfig")
+prepend_path("CMAKE_PREFIX_PATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/.")
+prepend_path("PATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/bin")
+prepend_path("MANPATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/share/man")
+prepend_path("PKG_CONFIG_PATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/lib/pkgconfig")
+prepend_path("CMAKE_PREFIX_PATH","/opt/pub/spack/python/3.10.10/gcc/9.4.0/.")
+help([[Name   : python
+Version: 3.10.10
+Target : zen2
+
+The Python programming language.
+]])
 ```
 {: .output}
 
-Here, we see that the `giflib` module itself also has a dependency, `gcc-libs`.
-So we have to load that first, then load `giflib`, and then finally load
-`ansys`.
+Indeed, they are the `python` dependencies that are loaded before setting
+the environment variables requiered to load `python`. Most modulefiles
+automatically load their dependencies, but for some of them, we need to load
+the dependencies manually.
+
+To unload a specific module, e.g. `python`, run the command
+`module unload python`. (On some systems, this will also unload the modules it
+depends on.)
 
 ```
-{{ site.remote.prompt }} module load gcc-libs/4.9.2
-{{ site.remote.prompt }} module load giflib/5.1.1
-{{ site.remote.prompt }} module load ansys
+{{ site.remote.prompt }} module unload python
+{{ site.remote.prompt }} module list
 ```
-{: .language-bash}
-
 ```
-~/Scratch/.config is configured
-...
-...
-~/.mw doesn't exist - creating
+No modules loaded
 ```
 {: .output}
-
-If you now use the `module list` command, you should see these three modules
-included in the list.
-
-To unload a specific module, e.g. `ansys`, run the command
-`module unload ansys`. (On some systems, this will also unload the modules it
-depends on. Currently this is not the case with Myriad.)
 
 If we wanted to unload everything at once (all modules), we could run
 `module purge` (unloads everything).
 
 ```
+{{ site.remote.prompt }} module load python 
 {{ site.remote.prompt }} module purge
 {{ site.remote.prompt }} module list
 ```
 {: .language-bash}
 
 ```
-No Modulefiles Currently Loaded.
+No modules loaded
 ```
 {: .output}

@@ -115,26 +115,26 @@ Creating a variable is easy — we just assign a value to a name using "="
 around the `=`!):
 
 ~~~
-$ SECRET_IDENTITY=Dracula
+$ SECRET_IDENTITY=Santos
 $ echo $SECRET_IDENTITY
 ~~~
 {: .language-bash}
 
 ~~~
-Dracula
+Santos
 ~~~
 {: .output}
 
 To change the value, just assign a new one:
 
 ~~~
-$ SECRET_IDENTITY=Camilla
+$ SECRET_IDENTITY=Dumont
 $ echo $SECRET_IDENTITY
 ~~~
 {: .language-bash}
 
 ~~~
-Camilla
+Dumont
 ~~~
 {: .output}
 
@@ -151,7 +151,7 @@ example, to make our `SECRET_IDENTITY` available to other programs that we call
 from our shell we can do:
 
 ~~~
-$ SECRET_IDENTITY=Camilla
+$ SECRET_IDENTITY=Dumont
 $ export SECRET_IDENTITY
 ~~~
 {: .language-bash}
@@ -159,7 +159,7 @@ $ export SECRET_IDENTITY
 You can also create and export the variable in a single step:
 
 ~~~
-$ export SECRET_IDENTITY=Camilla
+$ export SECRET_IDENTITY=Dumont
 ~~~
 {: .language-bash}
 
@@ -220,6 +220,11 @@ As soon as it finds a match, it stops searching and runs the program.
 
 To show how this works,
 here are the components of `PATH` listed one per line:
+
+```
+$ echo "$PATH" | tr ':' '\n'
+```
+{: .language-bash}
 
 ~~~
 /Users/vlad/bin

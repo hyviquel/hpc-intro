@@ -13,7 +13,7 @@ objectives:
 - "Describe the challenges with transferring large amounts of data off HPC systems."
 - "Convert many files to a single archive file using tar."
 keypoints:
-- "Be careful how you use the login node."
+- "Be careful how you use the login and head node."
 - "Your data on the system is your responsibility."
 - "Plan and test large data transfers."
 - "It is often best to convert many files to a single archive file before
@@ -31,15 +31,15 @@ resources is a natural outcome of the shared nature of these resources. There
 are other things you, as an upstanding member of the community, need to
 consider.
 
-## Be Kind to the Login Nodes
+## Be Kind to the Login/Head Nodes
 
-The login node is often busy managing all of the logged in users, creating and
+The login node is often busy managing all of the logged in users. The head node creating and
 editing files and compiling software. If the machine runs out of memory or
 processing capacity, it will become very slow and unusable for everyone. While
 the machine is meant to be used, be sure to do so responsibly -- in ways
 that will not adversely impact other users' experience.
 
-Login nodes are always the right place to launch jobs. Cluster policies vary,
+Head nodes are always the right place to launch jobs. Cluster policies vary,
 but they may also be used for proving out workflows, and in some cases, may
 host advanced cluster-specific debugging or development tools. The cluster may
 have modules that need to be loaded, possibly in a certain order, and paths or
@@ -47,9 +47,9 @@ library versions that differ from your laptop, and doing an interactive test
 run on the head node is a quick and reliable way to discover and fix these
 issues.
 
-> ## Login Nodes Are a Shared Resource
+> ## Login/Head Nodes Are a Shared Resource
 >
-> Remember, the login node is shared with all other users and your actions
+> Remember, the login and head node are shared with all other users and your actions
 > could cause issues for other people. Think carefully about the potential
 > implications of issuing commands that may use large amounts of resource.
 >
@@ -65,7 +65,7 @@ safely use it for your non-routine processing task. If something goes wrong
 -- the process takes too long, or doesn't respond -- you can use the
 `kill` command along with the _PID_ to terminate the process.
 
-> ## Login Node Etiquette
+> ## Head Node Etiquette
 >
 > Which of these commands would be a routine task to run on the login node?
 >
@@ -78,7 +78,7 @@ safely use it for your non-routine processing task. If something goes wrong
 > > ## Solution
 > >
 > > Building software, creating directories, and unpacking software are common
-> > and acceptable > tasks for the login node: options #2 (`make`), #3
+> > and acceptable > tasks for the head node: options #2 (`make`), #3
 > > (`mkdir`), and #5 (`tar`) are probably OK. Note that script names do not
 > > always reflect their contents: before launching #3, please
 > > `less create_directories.sh` and make sure it's not a Trojan horse.
@@ -90,7 +90,7 @@ safely use it for your non-routine processing task. If something goes wrong
 > {: .solution}
 {: .challenge}
 
-If you experience performance issues with a login node you should report it to
+If you experience performance issues with a head node you should report it to
 the system staff (usually via the helpdesk) for them to investigate.
 
 ## Test Before Scaling
@@ -108,7 +108,7 @@ wait many days in a queue for your job to fail within 10 seconds of starting due
 to a trivial typo in the job script. This is extremely frustrating!
 
 Most systems provide dedicated resources for testing that have short wait times
-to help you avoid this issue.
+to help you avoid this issue. In {{ site.remote.name }}, you can use the queues `testes`, `serial`, and `testegpu` for testing purposes.
 
 > ## Test Job Submission Scripts That Use Large Amounts of Resources
 >
@@ -243,25 +243,25 @@ talked about data transfer earlier.
 > best way to transfer them to {{ site.remote.name }}?
 >
 > 1. ```
->    {{ site.local.prompt }} scp -r data {{ site.remote.user }}@{{ site.remote.login }}:~/
+>    {{ site.local.prompt }} scp -P {{ site.remote.port }} -r data {{ site.remote.user }}@{{ site.remote.login }}:{{ site.remote.homelink }}
 >    ```
 >    {: .language-bash}
 > 2. ```
->    {{ site.local.prompt }} rsync -ra data {{ site.remote.user }}@{{ site.remote.login }}:~/
+>    {{ site.local.prompt }} rsync -e "ssh -p {{ site.remote.port }}" -ra data {{ site.remote.user }}@{{ site.remote.login }}:{{ site.remote.homelink }}
 >    ```
 >    {: .language-bash}
 > 3. ```
->    {{ site.local.prompt }} rsync -raz data {{ site.remote.user }}@{{ site.remote.login }}:~/
+>    {{ site.local.prompt }} rsync -e "ssh -p {{ site.remote.port }}" -raz data {{ site.remote.user }}@{{ site.remote.login }}:{{ site.remote.homelink }}
 >    ```
 >    {: .language-bash}
 > 4. ```
 >    {{ site.local.prompt }} tar -cvf data.tar data
->    {{ site.local.prompt }} rsync -raz data.tar {{ site.remote.user }}@{{ site.remote.login }}:~/
+>    {{ site.local.prompt }} rsync -e "ssh -p {{ site.remote.port }}" -raz data.tar {{ site.remote.user }}@{{ site.remote.login }}:{{ site.remote.homelink }}
 >    ```
 >    {: .language-bash}
 > 5. ```
 >    {{ site.local.prompt }} tar -cvzf data.tar.gz data
->    {{ site.local.prompt }} rsync -ra data.tar.gz {{ site.remote.user }}@{{ site.remote.login }}:~/
+>    {{ site.local.prompt }} rsync -e "ssh -p {{ site.remote.port }}" -ra data.tar.gz {{ site.remote.user }}@{{ site.remote.login }}:{{ site.remote.homelink }}
 >    ```
 >    {: .language-bash}
 >
