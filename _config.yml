@@ -41,12 +41,21 @@ remote:
   name: "CENAPAD"
   login: "cenapad.unicamp.br"
   node: lovelace
-  location: "UNICAMP"
-  homedir: "/home/lovelace/proj/projeto"
+  node_name: Lovelace
+  node_host: lovelace.ada.cenapad.unicamp.br
+  frontend: frontend
+  frontend_prompt: "[yourUsername@frontend ~]$ "
+  compute: adano85
+  compute_prompt: "[yourUsername@adano85 ~]$ "
   user: "yourUsername"
-  prompt: "[yourUsername@lovelace ~]$ "
+  prompt: "[yourUsername@lovelace ~]$ "  
+  location: "UNICAMP"
+  homedir: "/home/cenapad/proj/proj****"
+  homelink: "homelovelace"
   bash_shebang: "#!/bin/bash -l"
-
+  module_python3: python/3.10.10-gcc-9.4.0
+  port: 31459
+  
 sched:
   name: "PBS"
   submit:
@@ -55,7 +64,7 @@ sched:
     iopt: ""
   status: "qstat"
   flag:
-    user: "-u yourUsername"
+    user: "-u $USER"
     interactive: "-q testes -l walltime=15:00,mem=512mb"
     name: "-N"
     histdetail: "-f"

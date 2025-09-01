@@ -28,16 +28,22 @@ keypoints:
 If you have not already connected to {{ site.remote.name }}, please do so now:
 
 ```
-{{ site.local.prompt }}  ssh {{ site.remote.user }}@{{ site.remote.login }}
+{{ site.local.prompt }} ssh -p {{ site.remote.port }} {{ site.remote.user }}@{{ site.remote.login }}
 ```
 {: .language-bash}
+
 
 Take a look at your home directory on the remote system:
 
 ```
-{{ site.remote.prompt }} ls
+{{ site.remote.frontend_prompt }} ls
 ```
 {: .language-bash}
+
+```
+homelovelace  porcentual.******
+```
+{: .output}
 
 > ## What's different between your machine and the remote?
 >
@@ -69,19 +75,18 @@ having a separate root for each hard drive or storage medium, all files and
 devices are anchored to the "root" directory, which is `/`:
 
 ```
-{{ site.remote.prompt }} ls /
+{{ site.remote.frontend_prompt }} ls /
 ```
 {: .language-bash}
 ```
-bin   etc   lib64  proc  sbin     sys  var
-boot  {{ site.remote.homedir | replace: "/", "" }}  mnt    root  scratch  tmp  working
-dev   lib   opt    run   srv      usr
+account  boot  etc   INPE  lib32  libx32    media  opt   root  sbin  sys  usr
+bin      dev   home  lib   lib64  lovelace  mnt    proc  run   srv   tmp  var
 ```
 {: .output}
 
-The "{{ site.remote.homedir | replace: "/", "" }}" directory is the one where
-we generally want to keep all of our files. Other folders on a UNIX OS contain
-system files and change as you install new software or upgrade your OS.
+The `home` directory is the one where all `{{ site.remote.homedir  }}` are located.
+Other folders on a UNIX OS contain system files and change as you install new software
+or upgrade your OS.
 
 > ## Using HPC filesystems
 >
@@ -95,33 +100,41 @@ system files and change as you install new software or upgrade your OS.
 >   computer and is being transmitted and made available over the network!
 > * __Scratch__ -- typically faster than the networked Home directory, but not
 >   usually backed up, and should not be used for long term storage.
-> * __Work__ -- sometimes provided as an alternative to Scratch space, Work is
->   a fast file system accessed over the network. Typically, this will have
->   higher performance than your home directory, but lower performance than
->   Scratch; it may not be backed up. It differs from Scratch space in that
->   files in a work file system are not automatically deleted for you: you must
->   manage the space yourself.
 {: .callout}
 
 ## Nodes
 
+{% include figure.html url="" max-width="80%"
+   file="/fig/cluster-nodes.png"
+   alt="Node anatomy" caption="" %}
+
 Individual computers that compose a cluster are typically called _nodes_
 (although you will also hear people call them _servers_, _computers_ and
 _machines_). On a cluster, there are different types of nodes for different
-types of tasks. The node where you are right now is called the _login node_,
-_head node_, _landing pad_, or _submit node_. A login node serves as an access
-point to the cluster.
+types of tasks. The node where you are right now is called the _login node_. 
+If you access to the __{{ site.remote.node_name }}__ environment by executing
+`ssh {{ site.remote.node }}`, you will be in the _head node_, _master node_, 
+or _submit node_. The node you used to login is the _login node_
+({{ site.remote.frontend }}) and serves as an access point to the cluster.
+In some clusters the _login node_ and _head node_ can be the same server, but in {{ site.remote.name }} they are separated. 
 
-As a gateway, the login node should not be used for time-consuming or
+As a gateway, the head node should not be used for time-consuming or
 resource-intensive tasks. You should be alert to this, and check with your
 site's operators or documentation for details of what is and isn't allowed. It
-is well suited for uploading and downloading files, setting up software, and
-running tests. Generally speaking, in these lessons, we will avoid running jobs
-on the login node.
+is well suited for setting up software, and running tests. Generally speaking, 
+in these lessons, we will avoid running jobs on the head node.
 
 Who else is logged in to the login node?
 
 ```
+{{ site.remote.frontend_prompt }} who
+```
+{: .language-bash}
+
+And, what about the head node?
+
+```
+{{ site.remote.frontend_prompt }} ssh {{ site.remote.node }}
 {{ site.remote.prompt }} who
 ```
 {: .language-bash}
@@ -196,6 +209,7 @@ connect to a shared, remote fileserver or cluster of servers.
 >
 > ```
 > {{ site.remote.prompt }} exit
+> {{ site.remote.frontend_prompt }} exit
 > {{ site.local.prompt }}
 > ```
 > {: .language-bash}
@@ -228,14 +242,15 @@ connect to a shared, remote fileserver or cluster of servers.
 > {: .solution}
 {: .challenge}
 
-> ## Explore the Login Node
+> ## Explore the Head Node
 >
-> Now compare the resources of your computer with those of the login node.
+> Now compare the resources of your computer with those of the head node.
 >
 > > ## Solution
 > >
 > > ```
-> > {{ site.local.prompt }} ssh {{ site.remote.user }}@{{ site.remote.login }}
+> > {{ site.local.prompt }} ssh -p {{ site.remote.port }} {{ site.remote.user }}@{{ site.remote.login }}
+> > {{ site.remote.frontend_prompt }} ssh {{ site.remote.node }}
 > > {{ site.remote.prompt }} nproc --all
 > > {{ site.remote.prompt }} free -m
 > > ```
@@ -281,14 +296,14 @@ connect to a shared, remote fileserver or cluster of servers.
 > ## Compare Your Computer, the Login Node and the Compute Node
 >
 > Compare your laptop's number of processors and memory with the numbers you
-> see on the cluster login node and compute node. What implications do
+> see on the cluster login node, head node, and compute node. What implications do
 > you think the differences might have on running your research work on the
 > different systems and nodes?
 >
 > > ## Solution
 > >
 > > Compute nodes are usually built with processors that have _higher
-> > core-counts_ than the login node or personal computers in order to support
+> > core-counts_ than the login/head node or personal computers in order to support
 > > highly parallel tasks. Compute nodes usually also have substantially _more
 > > memory (RAM)_ installed than a personal computer. More cores tends to help
 > > jobs that depend on some work that is easy to perform in _parallel_, and

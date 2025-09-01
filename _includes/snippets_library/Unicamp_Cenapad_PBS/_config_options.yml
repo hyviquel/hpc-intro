@@ -7,12 +7,18 @@ local:
 remote:
   name: "CENAPAD"
   login: "cenapad.unicamp.br"
-  node: lovelace
+  user: "yourUsername"
+  frontend:
+    hostname: frontend
+    prompt: "[yourUsername@frontend ~]$ "
+  node: 
+    name: Lovelace
+    hostname: lovelace
+    prompt: "[yourUsername@lovelace ~]$ "
   location: "UNICAMP"
   homedir: "/home/lovelace/proj/projeto"
-  user: "yourUsername"
-  prompt: "[yourUsername@lovelace ~]$ "
   bash_shebang: "#!/bin/bash -l"
+  port: 31459
 
 sched:
   name: "PBS"

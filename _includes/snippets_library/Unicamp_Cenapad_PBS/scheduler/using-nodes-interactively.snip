@@ -16,4 +16,14 @@ allocated to you, you should be presented with a bash prompt. Note that the
 prompt will likely change to reflect your new location, in this case the worker
 node we are logged on. You can also verify this with `hostname`.
 
+```
+{{ site.remote.compute_prompt }} hostname
+```
+{: .language-bash}
+
+```
+{{ site.remote.compute_prompt }} {{ site.remote.compute }}
+```
+{: .output}
+
 When you are done with the interactive job, type exit to quit your session.

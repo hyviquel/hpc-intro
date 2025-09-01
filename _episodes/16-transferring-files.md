@@ -9,7 +9,6 @@ objectives:
 keypoints:
 - "`wget` and `curl -O` download a file from the internet."
 - "`scp` and `rsync` transfer files to and from your computer."
-- "You can use an SFTP client like FileZilla to transfer files through a GUI."
 ---
 
 Performing work on a remote computer is not very useful if we cannot get files
@@ -251,7 +250,7 @@ mechanism.
 To _upload to_ another computer, the template command is
 
 ```
-{{ site.local.prompt }} scp local_file {{ site.remote.user }}@{{ site.remote.login }}:remote_destination
+{{ site.local.prompt }} scp -P {{ site.remote.port }} local_file {{ site.remote.user }}@{{ site.remote.login }}:remote_destination
 ```
 {: .language-bash}
 
@@ -268,10 +267,10 @@ exists and is a file, the file is overwritten with the contents of
 `local_file`; if it does not exist, it is assumed to be a destination filename
 for `local_file`.
 
-Upload the lesson material to your remote home directory like so:
+Upload the lesson material to your remote home directory `homelovelace` like so:
 
 ```
-{{ site.local.prompt }} scp amdahl.tar.gz {{ site.remote.user }}@{{ site.remote.login }}:
+{{ site.local.prompt }} scp -P {{ site.remote.port }} amdahl.tar.gz {{ site.remote.user }}@{{ site.remote.login }}:{{ site.remote.homelink }}
 ```
 {: .language-bash}
 
@@ -310,7 +309,7 @@ until it reaches the bottom of the directory tree rooted at the folder name you
 provided.
 
 ```
-{{ site.local.prompt }} scp -r amdahl {{ site.remote.user }}@{{ site.remote.login }}:
+{{ site.local.prompt }} scp -P {{ site.remote.port }} -r amdahl {{ site.remote.user }}@{{ site.remote.login }}:{{ site.remote.homelink }}
 ```
 {: .language-bash}
 
@@ -338,7 +337,7 @@ If you want to upload a file to a location inside your home directory --
 which is often the case -- then you don't need a _leading_ `/`. After the `:`,
 you can type the destination path relative to your home directory.
 If your home directory _is_ the destination, you can leave the destination
-field blank, or type `~` -- the shorthand for your home directory -- for
+field blank, or type `~` -- the shorthand for your home directory (in the login node), use `{{ site.remote.homelink }}` to copy directly to the head node -- for
 completeness.
 
 With `scp`, a trailing slash on the target directory is optional, and has no effect.
@@ -356,12 +355,13 @@ A trailing slash on a source directory is important for other commands, like `rs
 > commonly used options:
 >
 > ```
-> {{ site.local.prompt }} rsync -avP amdahl.tar.gz {{ site.remote.user }}@{{ site.remote.login }}:
+> {{ site.local.prompt }} rsync -e "ssh -p {{ site.remote.port }}" -avP amdahl.tar.gz {{ site.remote.user }}@{{ site.remote.login }}:{{ site.remote.homelink }}
 > ```
 > {: .language-bash}
 >
 > The options are:
 >
+> * `-e` to specify the remote shell to use. In this case is used to set a custom SSH destination port "31459". 
 > * `-a` (**a**rchive) to preserve file timestamps, permissions, and folders,
 >    among other things; implies recursion
 > * `-v` (**v**erbose) to get verbose output to help monitor the transfer
@@ -371,12 +371,12 @@ A trailing slash on a source directory is important for other commands, like `rs
 > To recursively copy a directory, we can use the same options:
 >
 > ```
-> {{ site.local.prompt }} rsync -avP amdahl {{ site.remote.user }}@{{ site.remote.login }}:~/
+> {{ site.local.prompt }} rsync -e "ssh -p {{ site.remote.port }}" -avP amdahl {{ site.remote.user }}@{{ site.remote.login }}:{{ site.remote.homelink }}
 > ```
 > {: .language-bash}
 >
 > As written, this will place the local directory and its contents under your
-> home directory on the remote system. If a trailing slash is added to the
+> home directory on the remote  head node. If a trailing slash is added to the
 > source, a new directory corresponding to the transferred directory
 > will not be created, and the contents of the source directory will be
 > copied directly into the destination directory.
@@ -384,7 +384,7 @@ A trailing slash on a source directory is important for other commands, like `rs
 > To download a file, we simply change the source and destination:
 >
 > ```
-> {{ site.local.prompt }} rsync -avP {{ site.remote.user }}@{{ site.remote.login }}:amdahl ./
+> {{ site.local.prompt }} rsync -e "ssh -p {{ site.remote.port }}" -avP {{ site.remote.user }}@{{ site.remote.login }}:{{site.remote.homelink}}/amdahl ./
 > ```
 > {: .language-bash}
 {: .callout}
@@ -411,52 +411,13 @@ you will have to specify it using the appropriate flag, often `-p`, `-P`, or
 > >
 > > ```
 > > {{ site.local.prompt }} man rsync
-> > {{ site.local.prompt }} rsync --help | grep port
-> >      --port=PORT             specify double-colon alternate port number
-> > See http://rsync.samba.org/ for updates, bug reports, and answers
-> > {{ site.local.prompt }} rsync --port=768 amdahl.tar.gz {{ site.remote.user }}@{{ site.remote.login }}:
+> > {{ site.local.prompt }} rsync --help | grep verbose
+> >     --verbose, -v            increase verbosity
 > > ```
 > > {: .language-bash}
 > >
-> > (Note that this command will fail, as the correct port in this case is the
-> > default: 22.)
 > {: .solution}
 {: .challenge}
-
-## Transferring Files Interactively with FileZilla
-
-FileZilla is a cross-platform client for downloading and uploading files to and
-from a remote computer. It is absolutely fool-proof and always works quite
-well. It uses the `sftp` protocol. You can read more about using the `sftp`
-protocol in the command line in the
-[lesson discussion]({{ site.baseurl }}{% link _extras/discuss.md %}).
-
-Download and install the FileZilla client from <https://filezilla-project.org>.
-After installing and opening the program, you should end up with a window with
-a file browser of your local system on the left hand side of the screen. When
-you connect to the cluster, your cluster files will appear on the right hand
-side.
-
-To connect to the cluster, we'll just need to enter our credentials at the top
-of the screen:
-
-* Host: `sftp://{{ site.remote.login }}`
-* User: Your cluster username
-* Password: Your cluster password
-* Port: (leave blank to use the default port)
-
-Hit "Quickconnect" to connect. You should see your remote files appear on the
-right hand side of the screen. You can drag-and-drop files between the left
-(local) and right (remote) sides of the screen to transfer files.
-
-{% include {{ site.snippets }}/transferring-files/filezilla-ssh-tunnel-instructions.snip %}
-
-Finally, if you need to move large files (typically larger than a gigabyte)
-from one remote computer to another remote computer, SSH in to the computer
-hosting the files and use `scp` or `rsync` to transfer over to the other. This
-will be more efficient than using FileZilla (or related applications) that
-would copy from the source to your local machine, then to the destination
-machine.
 
 {% include links.md %}
 
