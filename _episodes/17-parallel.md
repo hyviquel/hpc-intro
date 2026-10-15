@@ -35,12 +35,14 @@ If you disconnected, log back in to the cluster.
 With the Amdahl source code on the cluster, we can install it, which will
 provide access to the `amdahl` executable.
 Move into the extracted directory, then use the Package Installer for Python,
-or `pip`, to install it in your ("user") home directory:
+or `pip`, to create a virtual environment (venv) and install `amdahl` in it
 
 ```
 {{ site.remote.prompt }} cd amdahl
-{{ site.remote.prompt }} module load python/3.8.12-gcc-9.4.0
-{{ site.remote.prompt }} python3 -m pip install --user .
+{{ site.remote.prompt }} module load python/3.10.10-gcc-9.4.0
+{{ site.remote.prompt }} python -m venv .venv
+{{ site.remote.prompt }} source .venv/bin/activate
+{{ site.remote.prompt }} pip install .
 ```
 {: .language-bash}
 
@@ -53,24 +55,11 @@ or `pip`, to install it in your ("user") home directory:
 
 ### MPI for Python
 
-The Amdahl code has one dependency: __mpi4py__. In {{site.remote.name }}, you can load it executing:
+The Amdahl code has one dependency: __mpi4py__. In {{site.remote.name }}, you can install in your venv with:
 
 ```
-{{ site.remote.prompt }} module load py-mpi4py/3.1.4-gcc-9.4.0
+{{ site.remote.prompt }} pip install mpi4py
 ```
-{: .language-bash}
-
-> ## If `pip` Raises a Warning...
->
-> `pip` may warn that your user package binaries are not in your PATH.
->
-> ```
-> WARNING: The script amdahl is installed in "${HOME}/.local/bin" which is
-> not on PATH. Consider adding this directory to PATH or, if you prefer to
-> suppress this warning, use --no-warn-script-location.
-> ```
-> {: .warning}
->
 > To check whether this warning is a problem, use `which` to search for the
 > `amdahl` program:
 >
@@ -79,25 +68,7 @@ The Amdahl code has one dependency: __mpi4py__. In {{site.remote.name }}, you ca
 > ```
 > {: .language-bash}
 >
-> If the command returns no output, displaying a new prompt, it means the file
-> `amdahl` has not been found. You must update the environment variable named
-> `PATH` to include the missing folder.
-> Edit your shell configuration file as follows, then log off the cluster and
-> back on again so it takes effect.
->
-> ```
-> {{ site.remote.prompt }} nano ~/.bashrc
-> {{ site.remote.prompt }} tail ~/.bashrc
-> ```
-> {: .language-bash}
-> ```
-> export PATH=${PATH}:${HOME}/.local/bin
-> ```
-> {: .output}
->
-> After logging back in to {{ site.remote.login }}, `which` should be able to
-> find `amdahl` without difficulties.
-> If you had to load a Python module, load it again.
+> If the command returns no output, you probably forgot to activate your venv with `source .venv/bin/activate`
 {: .discussion}
 
 ## Help!
@@ -267,7 +238,7 @@ parallel-job.sh       serial-job.sh     venv             README.md
 ```
 {: .output}
 ```
-{{ site.remote.prompt }} cat parallel-job.o299531 
+{{ site.remote.prompt }} cat parallel-job.o299531
 ```
 {: .language-bash}
 ```
